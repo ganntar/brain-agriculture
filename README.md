@@ -1,4 +1,4 @@
-# Teste - Brain Agriculture
+# Brain Agriculture
 
 ## Resumo do projeto
 
