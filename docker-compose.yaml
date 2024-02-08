@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  db:
+    image: postgres
+    container_name: brain_ag_db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - "5432:5432"
+    volumes:
+      - database:/var/lib/postgresql/data
+  
+volumes:
+   database:

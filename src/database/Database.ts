@@ -1,16 +1,17 @@
-import pg from 'pg';
-import { DatabaseConfig } from '../config/DatabaseConfig';
+import { Pool } from 'pg';
+import * as dotenv from 'dotenv';
 
+dotenv.config();
 
-export class Database {
-    
-    constructor(private readonly connectionString: DatabaseConfig) { }
-
-  async query(query: string, params = []): Promise<any[]> {
-    const client = new pg.Client(this.connectionString.Connect());
-    await client.connect();
-    const result = await client.query(query, params);
-    await client.end();
-    return result.rows;
-  }
+const { DB_USER, DB_HOST, DB_DATABASE, DB_PASSWORD, DB_PORT } = process.env;
+if (!DB_USER || !DB_HOST || !DB_DATABASE || !DB_PASSWORD || !DB_PORT) {
+    throw new Error('Faltam configurações de variáveis de ambiente para o banco de dados.');
 }
+
+export const db = new Pool({
+    user: DB_USER,
+    host: DB_HOST,
+    database: DB_DATABASE,
+    password: DB_PASSWORD,
+    port: parseInt(DB_PORT),
+});
