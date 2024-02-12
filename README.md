@@ -42,9 +42,7 @@ Os comandos devem ser executados na sequencia abaixo:
 A API expõe os seguintes *endpoints* a partir da *base URL* `localhost:3000`:
 
 `/produtor`
-* `GET /produtor`
-* `GET /produtor/totalfazendas`
-* `GET /produtor/totalFazendasHectares`
+
 * `POST /produtor`
 *  `Body exemplo`
 {
@@ -68,9 +66,14 @@ A API expõe os seguintes *endpoints* a partir da *base URL* `localhost:3000`:
 		"area_vegetacao": 200
 }
 * `DELETE /produtor/:id`
+* `GET /produtor`
+* `GET /produtor/totalfazendas`
+* `GET /produtor/totalFazendasHectares`
+* `GET /produtor/totalFazendasEstados`
+* `GET /produtor/porUsoSolo`
 
 `/culturas_plantadas `
-* `GET /culturas_plantadas`
+
 * `POST /culturas_plantadas`
 *  `Body exemplo`
 {
@@ -78,6 +81,7 @@ A API expõe os seguintes *endpoints* a partir da *base URL* `localhost:3000`:
 		"area_cultivada": 300,
 		"id_produtores": 1
 }
+
 * `PUT /culturas_plantadas/:id`
 *  `Body exemplo`
 {
@@ -85,5 +89,8 @@ A API expõe os seguintes *endpoints* a partir da *base URL* `localhost:3000`:
 		"area_cultivada": 300,
 		"id_produtores": 1
 }
+
 * `DELETE /culturas_plantadas/:id`
+* `GET /culturas_plantadas`
+* `GET /culturas_plantadas/totalPorCulturas`
 
