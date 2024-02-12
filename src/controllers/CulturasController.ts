@@ -1,25 +1,20 @@
 import { Request, Response } from "express";
 import { CulturasService } from "../services/culturaService";
 import { Culturas } from "../models/Culturas";
+import { ProdutorService } from "../services/ProdutorService";
 
 export class CulturasController {
   private culturasService: CulturasService;
+  private produtorService: ProdutorService;
 
   constructor() {
     this.culturasService = new CulturasService();
-  }
-
-  public async getCulturas(req: Request, res: Response): Promise<void> {
-    try {
-      const produtor = await this.culturasService.getCulturas();
-      res.status(200).json(produtor);
-    } catch (error) {
-      res.status(500).send(error.message);
-    }
+    this.produtorService = new ProdutorService();
   }
 
   public async createCulturas(req: Request, res: Response): Promise<void> {
     const { _, nome_cultura, area_cultivada, id_produtores } = req.body;
+    
     const newCultura = new Culturas(
       _,
       nome_cultura,
@@ -27,10 +22,17 @@ export class CulturasController {
       id_produtores
     );
     try {
+      const produtor = await this.produtorService.verifyProdutor(id_produtores);
+
+      if (produtor == 0) {
+        return res.status(404).send("Id do produtor não encontrado!");
+      }
+
       await this.culturasService.createCulturas(newCultura);
-      res.status(201).send("Produtor created successfully");
+
+        return res.status(201).send("Cultura created successfully");
     } catch (error) {
-      res.status(500).send(error.message);
+      return res.status(500).send(error.message);
     }
   }
 
@@ -43,8 +45,10 @@ export class CulturasController {
 		area_cultivada,
 		id_produtores
     );
+
     try {
-      await this.culturasService.updateCulturas(id_culturas, updatedCulturas);
+      const culturasUpdated = await this.culturasService.updateCulturas(id_culturas, updatedCulturas);
+
       res.status(201).send("Produtor updated successfully");
     } catch (error) {
       res.status(500).send(error.message);
@@ -56,6 +60,24 @@ export class CulturasController {
     try {
       await this.culturasService.deleteCulturas(id_culturas);
       res.status(200).send("Produtor deleted successfully");
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  }
+
+  public async getAllCulturas(req: Request, res: Response): Promise<void> {
+    try {
+      const culturas_plantadas = await this.culturasService.getAllCulturas();
+      res.status(200).json(culturas_plantadas);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  }
+
+  public async getPorCulturas(req: Request, res: Response): Promise<void> {
+    try {
+      const culturas_plantadas = await this.culturasService.getPorCulturas();
+      res.status(200).json(culturas_plantadas);
     } catch (error) {
       res.status(500).send(error.message);
     }

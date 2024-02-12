@@ -1,41 +1,12 @@
-import { db } from "../database/database";
+import { db } from "../database/db";
 import { Culturas } from "../models/Culturas";
 
 export class CulturasService {
-  public async getCulturas(): Promise<Culturas[]> {
-    const client = await db.connect();
-    try {
-      const result = await client.query("Select * from culturas_plantadas");
-      return result.rows.map(
-        (row: any) =>
-          new Culturas(
-            row.id_culturas,
-            row.nome_cultura,
-            row.area_cultivada,
-            row.id_produtores,
-          )
-      );
-    } finally {
-      client.release();
-    }
-  }
 
   public async createCulturas(culturas_plantadas: Culturas): Promise<void> {
     const client = await db.connect();
     try {
-      const produtor = await client.query(`SELECT p.*, cp.* FROM produtores p
-                                           INNER JOIN culturas_plantadas cp on cp.id_produtores = p.id_produtores
-                                           WHERE p.id_produtores = $1`, [culturas_plantadas.id_produtores]);
-      
-      
-
-      const total_area_cultivada = produtor.rows.reduce(
-        (accumulator, value) => accumulator + value.area_cultivada, 0);
-
-      if (produtor.rows[0].area_agricultavel <= (total_area_cultivada + culturas_plantadas.area_cultivada)) {
-        throw new Error;
-      }
-
+           
       await client.query(
         `INSERT INTO culturas_plantadas
                                 (nome_cultura,
@@ -54,7 +25,10 @@ export class CulturasService {
     }
     
     public async updateCulturas(id: number, culturas_plantadas: Culturas): Promise<void> {
-        const client = await db.connect();
+      const client = await db.connect();
+
+      const checkCulturas = await client.query("Select count(*) from culturas_plantadas where id_culturas = $1", [id]);
+
         try {
           await client.query(
             `UPDATE  culturas_plantadas SET
@@ -81,5 +55,33 @@ export class CulturasService {
         } finally {
             client.release();
         }
+  }
+
+  public async getAllCulturas(): Promise<Culturas[]> {
+    const client = await db.connect();
+    try {
+      const result = await client.query("Select * from culturas_plantadas");
+      return result.rows.map(
+        (row: any) =>
+          new Culturas(
+            row.id_culturas,
+            row.nome_cultura,
+            row.area_cultivada,
+            row.id_produtores,
+          )
+      );
+    } finally {
+      client.release();
     }
+  }
+
+  public async getPorCulturas(): Promise<Culturas[]>{
+    const client = await db.connect();
+    try {
+      const result = await client.query("Select nome_cultura, count(*) as total from culturas_plantadas group by nome_cultura");
+      return result.rows;
+    } finally {
+      client.release();
+    }
+  }
 }

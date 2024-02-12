@@ -1,40 +1,12 @@
 import { Request, Response } from 'express';
-import { ProdutorService } from '../services/produtorService';
+import { ProdutorService } from '../services/ProdutorService';
 import { Produtor } from '../models/Produtor';
-import { error } from 'console';
 
 export class ProdutorController {
     private produtorService: ProdutorService;
 
     constructor() {
 		this.produtorService = new ProdutorService();
-	}
-
-	public async getTotalFazendas(req: Request, res: Response): Promise<void>{
-		try {
-			const produtor = await this.produtorService.getTotalFazendas();
-			res.status(200).json(produtor);
-		} catch (error) {
-			res.status(500).send(error.message);
-		}
-	}
-
-	public async getTotalFazendasHectares(req: Request, res: Response): Promise<void>{
-		try {
-			const produtor = await this.produtorService.getTotalFazendasHectares();
-			res.status(200).json(produtor);
-		} catch (error) {
-			res.status(500).send(error.message);
-		}
-	}
-	
-	public async getProdutor(req: Request, res: Response): Promise<void>{
-		try {
-			const produtor = await this.produtorService.getProdutor();
-			res.status(200).json(produtor);
-		} catch (error) {
-			res.status(500).send(error.message);
-		}
 	}
 
 	public async createProdutor(req: Request, res: Response): Promise<void> {
@@ -89,7 +61,12 @@ export class ProdutorController {
 			area_total_fazenda,
 			area_agricultavel,
 			area_vegetacao);
-        try {
+		try {
+			let total_agri_vege = area_agricultavel + area_vegetacao;
+
+			if (total_agri_vege > area_total_fazenda) {
+				return res.status(412).send('A soma de área agrícultável e vegetação, não pode ser maior que a área total da fazenda')
+			}
             await this.produtorService.updateProdutor(id_produtores, updatedProdutor);
             res.status(201).send('Produtor updated successfully');
         } catch (error) {
@@ -105,5 +82,51 @@ export class ProdutorController {
         } catch (error) {
             res.status(500).send(error.message);
         }
-    }
+	}
+
+	public async getProdutor(req: Request, res: Response): Promise<void>{
+		try {
+			const produtor = await this.produtorService.getProdutor();
+			res.status(200).json(produtor);
+		} catch (error) {
+			res.status(500).send(error.message);
+		}
+	}
+	
+	public async getTotalFazendas(req: Request, res: Response): Promise<void>{
+		try {
+			const produtor = await this.produtorService.getTotalFazendas();
+			res.status(200).json(produtor);
+		} catch (error) {
+			res.status(500).send(error.message);
+		}
+	}
+
+	public async getTotalFazendasHectares(req: Request, res: Response): Promise<void>{
+		try {
+			const produtor = await this.produtorService.getTotalFazendasHectares();
+			res.status(200).json(produtor);
+		} catch (error) {
+			res.status(500).send(error.message);
+		}
+	}
+	
+	public async getFazendasPorEstados(req: Request, res: Response): Promise<void>{
+		try {
+			const produtor = await this.produtorService.getFazendasPorEstados();
+			res.status(200).json(produtor);
+		} catch (error) {
+			res.status(500).send(error.message);
+		}
+	}
+
+	public async getPorUsoSolo(req: Request, res: Response): Promise<void>{
+		try {
+			const produtor = await this.produtorService.getPorUsoSolo();
+			res.status(200).json(produtor);
+		} catch (error) {
+			res.status(500).send(error.message);
+		}
+	}
+
 }

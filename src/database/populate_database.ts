@@ -1,4 +1,4 @@
-import { db } from '../database/database';
+import { db } from './db';
 import * as fs from 'fs';
 
 const executeSqlScript = async (filePath: string): Promise<void> => {

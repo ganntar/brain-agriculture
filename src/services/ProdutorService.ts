@@ -1,50 +1,7 @@
-import { db } from "../database/database";
+import { db } from "../database/db";
 import { Produtor } from "../models/Produtor";
 
 export class ProdutorService {
-
-  public async getTotalFazendas(): Promise<Produtor[]> {
-    const client = await db.connect();
-    try {
-      const result = await client.query("Select count(*) as totalFazendas from produtores");
-      return result.rows[0];
-    } finally {
-      client.release();
-    }
-  }
-
-  public async getTotalFazendasHectares(): Promise<Produtor[]> {
-    const client = await db.connect();
-    try {
-      const result = await client.query("Select sum(area_total_fazenda) as totalFazendasHectares from produtores");
-
-      return result.rows[0];
-    } finally {
-      client.release();
-    }
-  }
-
-  public async getProdutor(): Promise<Produtor[]> {
-    const client = await db.connect();
-    try {
-      const result = await client.query("Select * from produtores");
-      return result.rows.map(
-        (row: any) =>
-          new Produtor(
-            row.id_produtores,
-            row.cpf_cnpj,
-            row.nome_fazenda,
-            row.cidade,
-            row.estado,
-            row.area_total_fazenda,
-            row.area_agricultavel,
-            row.area_vegetacao
-          )
-      );
-    } finally {
-      client.release();
-    }
-  }
 
   public async createProdutor(produtor: Produtor): Promise<void> {
     const client = await db.connect();
@@ -108,5 +65,79 @@ export class ProdutorService {
         } finally {
             client.release();
         }
+  }
+
+  public async getProdutor(): Promise<Produtor[]> {
+    const client = await db.connect();
+    try {
+      const result = await client.query("Select * from produtores");
+      return result.rows.map(
+        (row: any) =>
+          new Produtor(
+            row.id_produtores,
+            row.cpf_cnpj,
+            row.nome_fazenda,
+            row.cidade,
+            row.estado,
+            row.area_total_fazenda,
+            row.area_agricultavel,
+            row.area_vegetacao
+          )
+      );
+    } finally {
+      client.release();
     }
+  }
+  
+  public async getTotalFazendas(): Promise<Produtor[]> {
+    const client = await db.connect();
+    try {
+      const result = await client.query("Select count(*) as totalFazendas from produtores");
+      return result.rows[0];
+    } finally {
+      client.release();
+    }
+  }
+
+  public async getTotalFazendasHectares(): Promise<Produtor[]> {
+    const client = await db.connect();
+    try {
+      const result = await client.query("Select sum(area_total_fazenda) as totalFazendasHectares from produtores");
+
+      return result.rows[0];
+    } finally {
+      client.release();
+    }
+  }
+
+  public async getFazendasPorEstados(): Promise<Produtor[]>{
+    const client = await db.connect();
+    try {
+      const result = await client.query("Select count(*) as totalFazenda, estado from produtores group by estado");
+      return result.rows;
+    } finally {
+      client.release();
+    }
+  }
+
+  public async getPorUsoSolo(): Promise<Produtor[]>{
+    const client = await db.connect();
+    try {
+      const result = await client.query("select  sum(p.area_agricultavel) as areaAgricultavel, sum(p.area_vegetacao) as areaVegetacao, sum(p.area_total_fazenda) as areaTotalFazenda  from produtores p");
+      return result.rows;
+    } finally {
+      client.release();
+    }
+  }
+
+  public async verifyProdutor(id_produtor: number): Promise<number> {
+    const client = await db.connect();
+    try {
+      const result = await client.query(`Select count(*) from produtores where id_produtores = ${id_produtor}`);
+      return result.rows[0].count;
+    } finally {
+      client.release();
+    }
+  }
+
 }
